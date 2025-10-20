@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Recall AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .prose-dark {
+            color: #d1d5db;
+        }
+        .prose-dark h1, .prose-dark h2, .prose-dark h3 {
+            color: #f9fafb;
+        }
+        .prose-dark table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .prose-dark th, .prose-dark td {
+            border: 1px solid #4b5563;
+            padding: 12px;
+            text-align: left;
+        }
+        .prose-dark th {
+            background-color: #374151;
+        }
+        .prose-dark tr:nth-child(even) {
+            background-color: #1f2937;
+        }
+        .prose-dark code {
+            background-color: #374151;
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 6px;
+        }
+        .prose-dark blockquote {
+            border-left: 0.25em solid #4b5563;
+            padding-left: 1em;
+            color: #9ca3af;
+        }
+        .prose-dark ul {
+            list-style-type: disc;
+            padding-left: 2em;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-white">Personal Recall AI</h1>
+            <p class="text-gray-400 mt-2">Log your interactions and generate an AI-powered, explainable summary of your personal history.</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Left Panel: Input and Log -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col space-y-6">
+                <div>
+                    <h2 class="text-2xl font-semibold text-white mb-4">Interaction Log</h2>
+                    <div id="log-display" class="h-64 overflow-y-auto bg-gray-900 p-4 rounded-lg border border-gray-700 space-y-3">
+                        <!-- Log entries will be populated here -->
+                         <p class="text-gray-500 text-center">Your interaction log is empty. Add an entry below.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Add New Entry</h3>
+                    <textarea id="log-input" class="w-full h-32 p-3 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Log a meeting note, a thought, a task... e.g., 'Discussed Adam v21.0 integration with Jane.'"></textarea>
+                    <div id="log-error" class="text-red-400 text-sm mt-2 hidden"></div>
+                    <button id="add-log-btn" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-md flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Add to Log
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Analysis Control and Output -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col">
+                <h2 class="text-2xl font-semibold text-white mb-4">Recall Analysis</h2>
+                <button id="analyze-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-md flex items-center justify-center disabled:bg-indigo-800 disabled:cursor-not-allowed disabled:transform-none">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V3m0 18v-3M5.636 5.636l-1.414-1.414m15.556 15.556l-1.414-1.414M18.364 5.636l1.414-1.414m-15.556 15.556l1.414-1.414M12 12a6 6 0 100-12 6 6 0 000 12z" /></svg>
+                    Generate Analysis
+                </button>
+                <div id="analysis-output" class="mt-6 flex-grow bg-gray-900 p-4 rounded-lg border border-gray-700 overflow-y-auto prose-dark max-w-full">
+                   <div id="initial-state" class="flex flex-col items-center justify-center h-full text-center text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                        <p class="font-semibold">Analysis will appear here.</p>
+                        <p class="text-sm">Add at least one log entry, then click "Generate Analysis".</p>
+                    </div>
+                     <div id="loading-state" class="hidden flex flex-col items-center justify-center h-full text-center text-gray-400">
+                        <div class="loader"></div>
+                        <p class="mt-4 font-semibold">Analyzing your recall log...</p>
+                        <p class="text-sm">This may take a moment.</p>
+                    </div>
+                </div>
+                 <div id="analysis-error" class="text-red-400 text-sm mt-2 hidden"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // DOM Elements
+        const logInput = document.getElementById('log-input');
+        const addLogBtn = document.getElementById('add-log-btn');
+        const logDisplay = document.getElementById('log-display');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const analysisOutput = document.getElementById('analysis-output');
+        const logError = document.getElementById('log-error');
+        const analysisError = document.getElementById('analysis-error');
+        const initialState = document.getElementById('initial-state');
+        const loadingState = document.getElementById('loading-state');
+        
+        let db, auth;
+        let userId = null;
+        let logs = [];
+
+        // --- Firebase Initialization and Auth ---
+        async function initializeFirebase() {
+            try {
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        setupLogListener();
+                    } else {
+                        // User is signed out. Handle sign-in.
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Authentication Error:", error);
+                            logError.textContent = "Could not authenticate. Please refresh.";
+                            logError.classList.remove('hidden');
+                        }
+                    }
+                });
+            } catch(e) {
+                console.error("Firebase initialization failed:", e);
+                logError.textContent = "Could not connect to the database. App functionality is limited.";
+                logError.classList.remove('hidden');
+            }
+        }
+        
+        // --- Firestore Logic ---
+        function setupLogListener() {
+            if (!db || !userId) return;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const logsCollectionPath = `/artifacts/${appId}/users/${userId}/recall_logs`;
+            const q = query(collection(db, logsCollectionPath), orderBy("timestamp", "asc"));
+
+            onSnapshot(q, (querySnapshot) => {
+                logs = [];
+                logDisplay.innerHTML = '';
+                if (querySnapshot.empty) {
+                    logDisplay.innerHTML = '<p class="text-gray-500 text-center">Your interaction log is empty. Add an entry below.</p>';
+                    analyzeBtn.disabled = true;
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        logs.push(data);
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'bg-gray-800 p-2.5 rounded-md text-sm';
+                        const date = data.timestamp?.toDate ? data.timestamp.toDate().toLocaleString() : new Date().toLocaleString();
+                        logEntry.innerHTML = `<p class="text-gray-300">${data.text}</p><p class="text-xs text-gray-500 mt-1">${date}</p>`;
+                        logDisplay.appendChild(logEntry);
+                    });
+                    logDisplay.scrollTop = logDisplay.scrollHeight;
+                    analyzeBtn.disabled = false;
+                }
+            }, (error) => {
+                console.error("Error listening to logs: ", error);
+                logError.textContent = "Error fetching logs.";
+                logError.classList.remove('hidden');
+            });
+        }
+        
+        async function addLogEntry() {
+            const text = logInput.value.trim();
+            if (!text) {
+                logError.textContent = 'Log entry cannot be empty.';
+                logError.classList.remove('hidden');
+                return;
+            }
+            if (!db || !userId) {
+                logError.textContent = 'Database not connected.';
+                logError.classList.remove('hidden');
+                return;
+            }
+
+            logError.classList.add('hidden');
+            addLogBtn.disabled = true;
+            addLogBtn.classList.add('opacity-50');
+
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const logsCollectionPath = `/artifacts/${appId}/users/${userId}/recall_logs`;
+                await addDoc(collection(db, logsCollectionPath), {
+                    text: text,
+                    timestamp: serverTimestamp()
+                });
+                logInput.value = '';
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                logError.textContent = 'Failed to save log entry.';
+                logError.classList.remove('hidden');
+            } finally {
+                addLogBtn.disabled = false;
+                addLogBtn.classList.remove('opacity-50');
+            }
+        }
+
+        // --- Gemini API Logic ---
+        const PROMPT_TEMPLATE = `
+## 1. ROLE AND GOAL
+You are an expert-level Enterprise AI Assistant named "Recall". Your primary function is to analyze a personal interaction log to produce accurate, structured, and explainable summaries. You must synthesize complex discussions, tasks, and notes into actionable intelligence and a coherent personal profile.
+
+## 2. CONTEXT AND INPUTS
+* **Input:** A raw interaction log provided by the user, with each entry potentially having a timestamp.
+* **Core Task:** Generate a comprehensive personal recall summary, extract actionable follow-ups, and identify key topics of interest or activity.
+* **Methodology:**
+    1.  **Semantic Search:** You will semantically scan the entire log to locate key concepts, decisions, action items, risks, and assigned responsibilities, even if they are not explicitly keyword-matched.
+    2.  **Explainable AI (SHAP-like Rationale):** For each key topic identified, you must provide a "SHAP-like" rationale. This means you will pinpoint the specific phrases, sentiments, or data points (the "drivers") in the log that contribute most to that topic's importance and inclusion in the summary.
+
+## 3. PRIMARY DIRECTIVES
+1.  **Generate Executive Summary:** Write a high-level, 3-5 bullet point summary of the user's most critical activities, interests, and overall focus based on the log.
+2.  **Extract Action Items:** Identify all explicit and implicit follow-up tasks. Populate the 'Meeting Follow-ups (Action Items)' table. Infer owners and deadlines where possible. If not mentioned, use 'User' and 'TBD'.
+3.  **Analyze Key Topics:** Identify the 3-5 most significant topics in the user's life/work. Populate the 'Key Topic Analysis' table.
+4.  **Apply Explainability:** For the 'Key Topic Analysis' table, the "Explainability (SHAP-like Rationale)" column is mandatory. It must justify *why* a topic is important by citing the primary textual drivers (e.g., "Frequent mention of 'Project Adam'," "Multiple entries on 'game design'," "Final decision reached on 'Q4 budget'").
+
+## 4. REQUIRED OUTPUT FORMAT (MARKDOWN)
+* **Constraint:** You must generate *only* the Markdown output specified below. Do not add conversational text before or after the formatted output.
+
+---
+
+# Personal Recall & Analysis
+
+## Executive Summary
+* [Primary insight or activity 1]
+* [Primary insight or activity 2]
+* [Primary insight or activity 3]
+
+---
+
+## 1. Action Items
+
+| Tag (Topic) | Action Item (What) | Owner (Who) | Deadline (When) |
+| :--- | :--- | :--- | :--- |
+| [Topic_Tag] | [Specific task to be completed] | [Name/Team] | [Date or TBD] |
+
+---
+
+## 2. Key Topic Analysis (with Explainability)
+
+| Topic Tag | Details (Summary of Discussion) | Explainability (SHAP-like Rationale) |
+| :--- | :--- | :--- |
+| [Topic 1] | [Concise summary of this topic based on the log.] | **Key Drivers:** [Identify specific phrases, data points, or sentiments that caused this topic to be significant.] |
+| [Topic 2] | [Concise summary of this topic based on the log.] | **Key Drivers:** [Identify specific phrases, data points, or sentiments that caused this topic to be significant.] |
+| [Topic 3] | [Concise summary of this topic based on the log.] | **Key Drivers:** [Identify specific phrases, data points, or sentiments that caused this topic to be significant.] |
+`;
+
+        async function analyzeLog() {
+            if (logs.length === 0) {
+                analysisError.textContent = "Cannot analyze an empty log.";
+                analysisError.classList.remove('hidden');
+                return;
+            }
+            
+            analysisError.classList.add('hidden');
+            initialState.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            analysisOutput.innerHTML = '';
+            analysisOutput.appendChild(loadingState);
+            analyzeBtn.disabled = true;
+
+            const fullLogText = logs.map(log => {
+                const date = log.timestamp?.toDate ? log.timestamp.toDate().toLocaleString() : '';
+                return `${date}: ${log.text}`;
+            }).join('\n');
+            
+            const userQuery = `[MEETING_TRANSCRIPT]\n${fullLogText}`;
+            
+            const apiKey = "";
+            const apiUrl = `https://generativelace.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: PROMPT_TEMPLATE }]
+                },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const markdownText = candidate.content.parts[0].text;
+                    analysisOutput.innerHTML = marked.parse(markdownText);
+                } else {
+                    throw new Error("Invalid response structure from API.");
+                }
+
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                analysisError.textContent = `Analysis failed: ${error.message}`;
+                analysisError.classList.remove('hidden');
+                analysisOutput.innerHTML = ''; // Clear loading state
+                initialState.classList.remove('hidden'); // Show initial state again
+                analysisOutput.appendChild(initialState);
+            } finally {
+                loadingState.classList.add('hidden');
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        // --- Event Listeners ---
+        addLogBtn.addEventListener('click', addLogEntry);
+        logInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addLogEntry();
+            }
+        });
+        analyzeBtn.addEventListener('click', analyzeLog);
+
+        // Initialize the app
+        initializeFirebase();
+    </script>
+</body>
+</html>
