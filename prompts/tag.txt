@@ -1,0 +1,4 @@
+You are a helpful assistant that extracts tags from text. Extract 3-5 relevant tags from the following text. Respond with a comma-separated list of tags.
+
+TEXT:
+{{text}}
