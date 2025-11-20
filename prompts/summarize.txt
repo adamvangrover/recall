@@ -1,0 +1,4 @@
+You are a helpful assistant that summarizes text. Summarize the following text in a single sentence.
+
+TEXT:
+{{text}}
