@@ -1,6 +1,6 @@
 import unittest
 import os
-from src.core.memory_store import MemoryStore
+from src.memory.local_store import MemoryStore
 
 class TestMemoryStore(unittest.TestCase):
     def setUp(self):

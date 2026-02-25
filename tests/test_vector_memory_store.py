@@ -1,5 +1,6 @@
 import unittest
-from src.core.vector_memory_store import VectorMemoryStore
+from unittest.mock import MagicMock
+from src.memory.vector_store import VectorMemoryStore
 import chromadb
 
 class TestVectorMemoryStore(unittest.TestCase):
@@ -8,14 +9,24 @@ class TestVectorMemoryStore(unittest.TestCase):
         self.client = chromadb.Client()
         self.collection_name = "test_memories"
 
-        # Instantiate the store and override its internal client
+        # Instantiate the store
+        # Note: This will load the EmbeddingService model which is slow.
+        # Ideally we'd inject dependencies, but for now we patch it after init.
         self.store = VectorMemoryStore()
         self.store._client = self.client
         self.store._collection = self.client.get_or_create_collection(name=self.collection_name)
 
+        # Mock embedding service to avoid model loading/inference
+        self.store._embedding_service = MagicMock()
+        # Mock return value to be a list of floats (size 384 for example)
+        self.store._embedding_service.generate_embedding.return_value = [0.1] * 384
+
     def tearDown(self):
         # Clean up the collection after each test to ensure test isolation
-        self.client.delete_collection(name=self.collection_name)
+        try:
+            self.client.delete_collection(name=self.collection_name)
+        except:
+            pass
 
     def test_add_and_list_memory(self):
         """Tests that a memory can be added and then listed."""
@@ -43,8 +54,6 @@ class TestVectorMemoryStore(unittest.TestCase):
         self.store.add_memory("I enjoy apples")
         self.store.add_memory("I enjoy bananas")
 
-        # Since we use a placeholder embedding, search is not truly semantic.
-        # This test just ensures the search function returns results in the correct format.
         results = self.store.search_memory("fruits")
         self.assertIsInstance(results, list)
 
