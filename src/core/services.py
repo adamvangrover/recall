@@ -1,4 +1,4 @@
-from src.core.vector_memory_store import VectorMemoryStore
+from src.memory.vector_store import VectorMemoryStore
 
 # Instantiate the single, persistent VectorMemoryStore for the application
 memory_store = VectorMemoryStore()
