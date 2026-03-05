@@ -1,5 +1,5 @@
 import unittest
-from src.core.vector_memory_store import VectorMemoryStore
+from memory.local_vector_store.vector_memory_store import VectorMemoryStore
 import chromadb
 
 class TestVectorMemoryStore(unittest.TestCase):
