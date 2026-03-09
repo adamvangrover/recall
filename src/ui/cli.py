@@ -70,3 +70,42 @@ def serve(port):
     """Starts the Agent API server."""
     click.echo(f"Starting API server on port {port}...")
     uvicorn.run("src.api.server:app", host="0.0.0.0", port=port, reload=False)
+
+@cli.group(name="recall", invoke_without_command=True)
+@click.pass_context
+def recall_group(ctx):
+    """Advanced recall features."""
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+
+@recall_group.command(name="graph")
+@click.argument('memory_id')
+def graph_cmd(memory_id):
+    """Visualizes the connections for a specific memory."""
+    from src.core.services import get_memory_graph
+    result = get_memory_graph(memory_id)
+    click.echo(result)
+
+@recall_group.command(name="link")
+@click.argument('source_id')
+@click.argument('target_id')
+@click.option('--relation', default="related_to", help='Relationship type')
+def link_cmd(source_id, target_id, relation):
+    """Explicitly link two memories in the Knowledge Graph."""
+    from src.core.services import link_memories
+    if link_memories(source_id, target_id, relation):
+        click.echo(f"Successfully linked {source_id} -> {target_id} [{relation}]")
+    else:
+        click.echo("Failed to link memories.")
+
+@recall_group.command(name="optimize")
+@click.option('--days', default=30, help='Number of days inactive to consider cold')
+def optimize_cmd(days):
+    """Scans for cold memories and calculates potential storage savings."""
+    from src.core.services import optimize_memory_storage
+    results = optimize_memory_storage(days)
+    click.echo(f"Optimization Analysis (Inactive > {days} days):")
+    click.echo(f"Cold Memories Found: {results['cold_count']}")
+    click.echo(f"Total Original Size (Cold): {results['total_original_bytes']} bytes")
+    click.echo(f"Total Compressed Size (Cold): {results['total_compressed_bytes']} bytes")
+    click.echo(f"Potential Storage Savings: {results['potential_savings_bytes']} bytes")
