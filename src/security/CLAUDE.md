@@ -1,4 +1,4 @@
-# AGENTS.md: Security
+# CLAUDE.md: Security
 
 This document provides a guide for AI agents developing the Security module for the Total Recall System.
 
@@ -16,7 +16,26 @@ To handle the secure storage and management of API keys and other sensitive data
 - Implement encryption for any sensitive data that is stored locally.
 - Use a strong encryption algorithm like AES-256.
 
-## 3. Guiding Principles
+## 3. Neuro-Symbolic System Architecture (Signal Intelligence)
+
+<system_graph>
+  <entities>
+    <entity id="Security_Manager" type="Guard" />
+    <entity id="Memory_Store" type="Semantic_Memory_DB" />
+  </entities>
+  <relationships>
+    <relationship source="Security_Manager" target="Memory_Store" type="protects" />
+  </relationships>
+  <signal_flows>
+    <flow id="Secure_Access">
+      <step>LLM_Agent requests sensitive operation.</step>
+      <step>Security_Manager validates keys and policies.</step>
+      <step>Operation is permitted or denied, preventing unauthorized signal leakage.</step>
+    </flow>
+  </signal_flows>
+</system_graph>
+
+## 4. Guiding Principles
 
 - **Principle of Least Privilege:** The module should only have access to the data that it needs to perform its functions.
 - **Secure by Default:** The module should be secure by default and should not require any special configuration to be secure.

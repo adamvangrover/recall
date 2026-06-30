@@ -2,7 +2,7 @@
 wip prob storage
 
 ````markdown
-# README_AGENTS.md
+# README_CLAUDE.md
 # Total Recall System: Production Specification (v1.0)
 
 ## 1. Project Vision & Core Principles
