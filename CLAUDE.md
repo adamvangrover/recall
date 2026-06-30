@@ -1,4 +1,4 @@
-# AGENTS.md: Total Recall System (Portable LLM Edition)
+# CLAUDE.md: Total Recall System (Portable LLM Edition)
 
 This document provides a comprehensive guide for AI agents involved in the development of the Total Recall System. It outlines the project's vision, core principles, and architecture for a portable, LLM-powered application.
 
@@ -19,12 +19,39 @@ To create a portable, secure, and powerful personal recall system that provides 
 The system is designed as a Python-based command-line application with a modular architecture.
 
 - **Core Logic (`src/core`):** Contains the main business logic, data models, and the vector-based memory store.
-- **Command-Line Interface (`src/cli`):** Provides the user interface for interacting with the system.
-- **LLM Interaction (`src/llm`):** Manages all communication with the LLM and embedding model APIs.
+- **Memory Logic (`src/memory`):** Semantic vector storage, context management, NLP tagging, and knowledge graph integration.
+- **Command-Line Interface (`src/ui`):** Provides the user interface for interacting with the system.
+- **MCP Interfaces (`src/mcp`):** Exposes engine and memory tools.
+- **API (`src/api`):** Core API layer for external interactions.
 - **Security (`src/security`):** Handles the secure storage and management of API keys and other sensitive data.
 - **Prompts (`prompts`):** Contains the prompt templates used to interact with the LLMs.
 
-## 3. Development Guidelines
+## 3. Neuro-Symbolic System Architecture (Signal Intelligence)
+
+<system_graph>
+  <entities>
+    <entity id="LLM_Agent" type="Cognitive_Processor" />
+    <entity id="Vector_Store" type="Semantic_Memory_DB" />
+    <entity id="Knowledge_Graph" type="Symbolic_Memory_DB" />
+    <entity id="Alpha_Signal_Gen" type="Financial_Signal_Engine" />
+  </entities>
+  <relationships>
+    <relationship source="LLM_Agent" target="Vector_Store" type="semantic_query" />
+    <relationship source="LLM_Agent" target="Knowledge_Graph" type="symbolic_query" />
+    <relationship source="Knowledge_Graph" target="Vector_Store" type="neuro_symbolic_link" />
+    <relationship source="Alpha_Signal_Gen" target="Vector_Store" type="stores_signals" />
+  </relationships>
+  <signal_flows>
+    <flow id="Financial_Insight">
+      <step>Alpha_Signal_Gen computes SMA crossovers.</step>
+      <step>Signal is encoded as semantic vector in Vector_Store.</step>
+      <step>Knowledge_Graph links ticker, signal, and timestamp.</step>
+      <step>LLM_Agent retrieves neuro-symbolic insight for reasoning.</step>
+    </flow>
+  </signal_flows>
+</system_graph>
+
+## 4. Development Guidelines
 
 - **Modularity:** Each component should be developed as a self-contained module with a well-defined API.
 - **Testability:** The code should be written in a way that allows it to be easily tested.

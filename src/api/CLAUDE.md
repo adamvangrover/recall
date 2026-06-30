@@ -1,0 +1,34 @@
+# CLAUDE.md: API Layer
+
+This document provides a guide for AI agents developing the API module for the Total Recall System.
+
+## 1. Objective
+To serve as the main programmatic access point for external clients interacting with the Recall System.
+
+## 2. Key Responsibilities
+- Define REST or graph-based schemas mapping to underlying memory and core engine logic.
+- Ensure efficient serialization of neuro-symbolic payload data.
+
+## 3. Neuro-Symbolic System Architecture (Signal Intelligence)
+
+<system_graph>
+  <entities>
+    <entity id="API_Gateway" type="Boundary" />
+    <entity id="Memory_System" type="Neuro_Symbolic_Core" />
+  </entities>
+  <relationships>
+    <relationship source="API_Gateway" target="Memory_System" type="routes_traffic" />
+  </relationships>
+  <signal_flows>
+    <flow id="External_Query">
+      <step>External request triggers API route.</step>
+      <step>API layer maps raw data to semantic structures.</step>
+      <step>Memory system processes the query and returns neuro-symbolic insight.</step>
+      <step>API boundary serializes output back to client.</step>
+    </flow>
+  </signal_flows>
+</system_graph>
+
+## 4. Guiding Principles
+- **Contracts:** API endpoints must remain stable, allowing agents to reliably format output schemas.
+- **Traceability:** Propagate context IDs through API layers to track signal intelligence lifecycles.

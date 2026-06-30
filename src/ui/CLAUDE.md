@@ -1,0 +1,34 @@
+# CLAUDE.md: UI Layer
+
+This document provides a guide for AI agents developing the Command-Line Interface (CLI) for the Total Recall System.
+
+## 1. Objective
+To provide an intuitive user interface for executing financial tools, semantic search, and graph operations.
+
+## 2. Key Responsibilities
+- Implement Click-based CLI commands (`src/ui/cli.py`).
+- Expose sub-commands for `price`, `risk`, `backtest`, `recall graph`, `recall link`, and `recall optimize`.
+
+## 3. Neuro-Symbolic System Architecture (Signal Intelligence)
+
+<system_graph>
+  <entities>
+    <entity id="CLI" type="User_Interface" />
+    <entity id="User" type="Human_Agent" />
+  </entities>
+  <relationships>
+    <relationship source="User" target="CLI" type="interacts" />
+    <relationship source="CLI" target="Memory_System" type="dispatches_commands" />
+  </relationships>
+  <signal_flows>
+    <flow id="User_Interaction">
+      <step>User issues a natural language or structured CLI command.</step>
+      <step>CLI translates the intent into system signals.</step>
+      <step>System output is formatted (e.g. rich text, tables) for human cognitive processing.</step>
+    </flow>
+  </signal_flows>
+</system_graph>
+
+## 4. Guiding Principles
+- **Usability:** Output should be semantically clear and readable, applying formatting to highlight key intelligence signals.
+- **Portability:** CLI should run consistently across OS environments using standard Python packaging.

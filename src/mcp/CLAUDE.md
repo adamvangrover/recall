@@ -1,0 +1,33 @@
+# CLAUDE.md: MCP Layer
+
+This document provides a guide for AI agents developing the MCP (Model Context Protocol) Tools module for the Total Recall System.
+
+## 1. Objective
+To expose robust tool interfaces mapping to core financial engines and advanced memory operations.
+
+## 2. Key Responsibilities
+- Implement API wrappers (`mcp/tools.py`) for simulated financial engines (`price`, `risk`, `backtest`).
+- Expose advanced memory actions (`link_memories`, `optimize_memory_storage`, `get_related_memories`).
+
+## 3. Neuro-Symbolic System Architecture (Signal Intelligence)
+
+<system_graph>
+  <entities>
+    <entity id="MCP_Tool_Registry" type="Interface" />
+    <entity id="LLM_Agent" type="Cognitive_Processor" />
+  </entities>
+  <relationships>
+    <relationship source="LLM_Agent" target="MCP_Tool_Registry" type="invokes" />
+  </relationships>
+  <signal_flows>
+    <flow id="Tool_Invocation">
+      <step>Agent determines need for external calculation or memory mutation.</step>
+      <step>MCP layer translates symbolic intent into concrete neural/procedural API calls.</step>
+      <step>Result signals are fed back into context.</step>
+    </flow>
+  </signal_flows>
+</system_graph>
+
+## 4. Guiding Principles
+- **Clarity:** Tool descriptions must be explicitly documented to help the LLM form precise invocation intents.
+- **Safety:** Tools must validate inputs before mutating neuro-symbolic states.
