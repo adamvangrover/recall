@@ -1,3 +1,23 @@
+# Recall System
+
+A portable, modular, neuro-symbolic personal memory recall system.
+
+## Setup & Documentation
+
+Please see the `docs/` directory for comprehensive documentation based on the Diátaxis framework:
+
+*   **[Tutorials](docs/tutorials/getting_started.md)**: Step-by-step guides for learning how to use the system.
+*   **[How-To Guides](docs/how-to/use_memory.md)**: Goal-oriented guides for completing specific tasks.
+*   **[Reference](docs/reference/cli.md)**: Technical descriptions of the machinery and architecture.
+*   **[Explanation](docs/explanation/architecture.md)**: Clarification and discussion of the system concepts.
+*   **Setup Guides**: Instructions for [Linux](docs/setup/linux.md), [Windows](docs/setup/windows.md), and [macOS](docs/setup/macos.md).
+
+## Memory Architecture
+
+The system uses a neuro-symbolic architecture (`.ans` files) for adding memory and semantically significant signal intelligence to LLMs.
+
+---
+
 # recall
 wip prob storage
 
