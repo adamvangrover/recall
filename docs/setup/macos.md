@@ -18,7 +18,10 @@ To install the Recall System on macOS, follow these steps:
     pip install -e .
     ```
 
-4.  **Verify installation:**
+4.  **Vector DB Storage Management:**
+    By default, the Vector DB (ChromaDB) stores data in `~/.chroma_db`. Ensure your macOS user has write access to their home directory.
+
+5.  **Verify installation:**
     ```bash
     recall --help
     ```

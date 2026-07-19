@@ -1,74 +1,95 @@
 import click
 import uvicorn
 import os
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
 from src.core.services import add_memory, search_memory, list_memories, delete_memory
 from src.core.ingestion import IngestionService
 from src.memory.vector_store import VectorMemoryStore
+
+console = Console()
 
 @click.group()
 def cli():
     """Total Recall: A portable, LLM-powered personal recall system."""
     pass
 
+def prompt_if_missing(ctx, param, value):
+    if not value:
+        return click.prompt(f"Please provide {param.name}")
+    return value
+
 @cli.command()
-@click.argument('content')
+@click.argument('content', callback=prompt_if_missing, required=False)
 def add(content):
     """Adds a new memory to the system."""
     memory_id = add_memory(content)
     if memory_id:
-        click.echo(f"Memory added with ID: {memory_id}")
+        console.print(f"[bold green]Memory added successfully![/bold green] (ID: [cyan]{memory_id}[/cyan])")
     else:
-        click.echo("Failed to add memory.")
+        console.print("[bold red]Failed to add memory.[/bold red]")
 
 @cli.command()
-@click.argument('query')
+@click.argument('query', callback=prompt_if_missing, required=False)
 def search(query):
     """Performs a semantic search for memories."""
     results = search_memory(query)
     if results:
-        click.echo("Found memories:")
+        table = Table(title=f"Search Results for '{query}'", show_header=True, header_style="bold magenta")
+        table.add_column("ID", style="cyan", no_wrap=True)
+        table.add_column("Similarity", justify="right", style="green")
+        table.add_column("Content")
+
         for res in results:
             similarity = res.get('similarity', 0) * 100
-            click.echo(f"- ID: {res['id']}, Similarity: {similarity:.2f}%\n  Content: {res['content']}\n")
+            table.add_row(res['id'], f"{similarity:.2f}%", res['content'])
+
+        console.print(table)
     else:
-        click.echo("No results found.")
+        console.print("[yellow]No memories found matching your query.[/yellow]")
 
 @cli.command(name="list")
 def list_command():
     """Lists all memories."""
     results = list_memories()
     if results:
-        click.echo("All memories:")
+        table = Table(title="All Memories", show_header=True, header_style="bold magenta")
+        table.add_column("ID", style="cyan", no_wrap=True)
+        table.add_column("Content")
+
         for res in results:
-            click.echo(f"- ID: {res['id']}\n  Content: {res['content']}\n")
+            table.add_row(res['id'], res['content'])
+
+        console.print(table)
     else:
-        click.echo("No memories found.")
+        console.print("[yellow]No memories found in the system.[/yellow]")
 
 @cli.command()
-@click.argument('memory_id')
+@click.argument('memory_id', callback=prompt_if_missing, required=False)
 def delete(memory_id):
     """Deletes a memory by its ID."""
     if delete_memory(memory_id):
-        click.echo(f"Memory with ID {memory_id} deleted.")
+        console.print(f"[bold green]Successfully deleted memory ID:[/bold green] [cyan]{memory_id}[/cyan]")
     else:
         # This branch may not be hit if ChromaDB doesn't error, but it's good practice.
-        click.echo(f"Failed to delete memory with ID {memory_id}.")
+        console.print(f"[bold red]Failed to delete memory with ID {memory_id}.[/bold red]")
 
 @cli.command()
-@click.argument('path')
+@click.argument('path', callback=prompt_if_missing, required=False)
 def ingest(path):
     """Ingests text/markdown files from a directory."""
-    click.echo(f"Ingesting files from: {path}")
+    console.print(f"Ingesting files from: [cyan]{path}[/cyan]...")
     store = VectorMemoryStore()
     service = IngestionService(store)
     count = service.ingest_directory(path)
-    click.echo(f"Successfully ingested {count} files.")
+    console.print(f"[bold green]Successfully ingested {count} files.[/bold green]")
 
 @cli.command()
 @click.option('--port', default=8000, help='Port to run the API on.')
 def serve(port):
     """Starts the Agent API server."""
-    click.echo(f"Starting API server on port {port}...")
+    console.print(f"[bold green]Starting API server on port {port}...[/bold green]")
     uvicorn.run("src.api.server:app", host="0.0.0.0", port=port, reload=False)
 
 @cli.group(name="recall", invoke_without_command=True)
@@ -76,27 +97,28 @@ def serve(port):
 def recall_group(ctx):
     """Advanced recall features."""
     if ctx.invoked_subcommand is None:
-        click.echo(ctx.get_help())
+        console.print(ctx.get_help())
 
 @recall_group.command(name="graph")
-@click.argument('memory_id')
+@click.argument('memory_id', callback=prompt_if_missing, required=False)
 def graph_cmd(memory_id):
     """Visualizes the connections for a specific memory."""
     from src.core.services import get_memory_graph
     result = get_memory_graph(memory_id)
-    click.echo(result)
+    panel = Panel(result, title=f"Knowledge Graph: [cyan]{memory_id}[/cyan]", border_style="blue")
+    console.print(panel)
 
 @recall_group.command(name="link")
-@click.argument('source_id')
-@click.argument('target_id')
+@click.argument('source_id', callback=prompt_if_missing, required=False)
+@click.argument('target_id', callback=prompt_if_missing, required=False)
 @click.option('--relation', default="related_to", help='Relationship type')
 def link_cmd(source_id, target_id, relation):
     """Explicitly link two memories in the Knowledge Graph."""
     from src.core.services import link_memories
     if link_memories(source_id, target_id, relation):
-        click.echo(f"Successfully linked {source_id} -> {target_id} [{relation}]")
+        console.print(f"[bold green]Successfully linked[/bold green] [cyan]{source_id}[/cyan] -> [cyan]{target_id}[/cyan] [[magenta]{relation}[/magenta]]")
     else:
-        click.echo("Failed to link memories.")
+        console.print("[bold red]Failed to link memories.[/bold red]")
 
 @recall_group.command(name="optimize")
 @click.option('--days', default=30, help='Number of days inactive to consider cold')
@@ -104,8 +126,14 @@ def optimize_cmd(days):
     """Scans for cold memories and calculates potential storage savings."""
     from src.core.services import optimize_memory_storage
     results = optimize_memory_storage(days)
-    click.echo(f"Optimization Analysis (Inactive > {days} days):")
-    click.echo(f"Cold Memories Found: {results['cold_count']}")
-    click.echo(f"Total Original Size (Cold): {results['total_original_bytes']} bytes")
-    click.echo(f"Total Compressed Size (Cold): {results['total_compressed_bytes']} bytes")
-    click.echo(f"Potential Storage Savings: {results['potential_savings_bytes']} bytes")
+
+    content = (
+        f"[bold]Cold Memories Found:[/bold] {results['cold_count']}\n"
+        f"[bold]Total Original Size (Cold):[/bold] {results['total_original_bytes']} bytes\n"
+        f"[bold]Total Compressed Size (Cold):[/bold] {results['total_compressed_bytes']} bytes\n"
+        f"\n"
+        f"[bold green]Potential Storage Savings:[/bold green] {results['potential_savings_bytes']} bytes"
+    )
+
+    panel = Panel(content, title=f"Optimization Analysis (Inactive > {days} days)", border_style="green")
+    console.print(panel)

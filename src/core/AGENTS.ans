@@ -1,3 +1,10 @@
+---
+module: core
+type: procedural_node
+dependencies: [src/memory]
+status: stable
+---
+
 # AGENTS.ans: Core Logic
 
 This document provides a guide for AI agents developing the Core Logic for the Total Recall System.

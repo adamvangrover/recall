@@ -1,3 +1,10 @@
+---
+module: api
+type: boundary_node
+dependencies: [src/memory, src/core]
+status: stable
+---
+
 # AGENTS.ans: API Layer
 
 This document provides a guide for AI agents developing the API module for the Total Recall System.

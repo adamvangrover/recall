@@ -44,3 +44,19 @@ Expanded the memory layer by introducing specific ontologies, data layer abstrac
 **Consequences:**
 - Further compartmentalizes architectural rules, requiring agents to traverse subdirectories for specific contexts.
 - Enables more precise injection of rules related to data storage format and token budgeting.
+
+## ADR-003: Interactive UI and Strict Diátaxis Documentation
+
+**Date:** 2024-05-18
+
+**Context:**
+The core system functionality works well, but the CLI lacks semantic highlighting, making human review of complex signals difficult. Additionally, while the `.ans` files work, they lacked a strict schema, and documentation was sparse, meaning agents could drift from the core memory architecture without clear reference material.
+
+**Decision:**
+1.  Upgraded the CLI (`src/ui/cli.py`) to utilize the `rich` library to render tables, markdown, and panels, ensuring key intelligence signals are easily parsable.
+2.  Standardized the `.ans` files across the codebase to prepend a strict YAML frontmatter, acting as semantic filters to complement the `<system_graph>` XML.
+3.  Expanded the Diátaxis documentation (`docs/`) to act as the central reference point, explicitly detailing the new UI and providing guides on how agents must interact with the `.ans` schema.
+
+**Consequences:**
+-   The `rich` library is now a required dependency for UI rendering.
+-   Agents modifying the system must strictly adhere to the `docs/reference/ans_schema.md` when updating or creating new `.ans` files.

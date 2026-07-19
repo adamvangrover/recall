@@ -1,3 +1,10 @@
+---
+module: memory
+type: neuro_symbolic_core
+dependencies: [docs/memory]
+status: stable
+---
+
 # AGENTS.ans: Memory System
 
 This document provides a guide for AI agents developing the Memory module for the Total Recall System.
