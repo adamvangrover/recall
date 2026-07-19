@@ -8,10 +8,12 @@ project: Total Recall System
 This document is the short-term working memory. It defines the current micro-goal and tracks progress.
 
 ## [ ] Current Objective
-- Continue iterating on the modular neuro-symbolic memory setup.
-- Integrate new primitives for ontologies, data layers, connectors, and state/token management, ensuring the system can fluidly switch between binary storage and natural language context.
+- Next phase of architecture iterations, ensuring external plugins or tools hook into the robust `.ans` layer.
 
 ## [x] Recently Completed
+- Upgraded the CLI to an interactive, rich terminal UI using the `rich` library.
+- Fleshed out Diátaxis documentation structure, expanding `docs/tutorials`, `docs/setup`, and creating `ans_schema.md` and `manage_ans_files.md`.
+- Standardized the neuro-symbolic `.ans` files across the codebase to use strict YAML frontmatter.
 - Expanded `docs/memory/` directory structure with `ontologies`, `data_layers`, `connectors`, and `state_management`.
 - Established primitives for Core Entities, Storage Abstraction, Chroma Connector, and Context Lifecycle.
 - Created the foundational core directive and state files: `@system_architecture.md`, `@current_context.md`, `@adr_log.md`.

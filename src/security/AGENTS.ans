@@ -1,3 +1,10 @@
+---
+module: security
+type: guard_node
+dependencies: [src/core, src/memory]
+status: stable
+---
+
 # AGENTS.ans: Security
 
 This document provides a guide for AI agents developing the Security module for the Total Recall System.

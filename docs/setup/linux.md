@@ -18,7 +18,10 @@ To install the Recall System on Linux, follow these steps:
     pip install -e .
     ```
 
-4.  **Verify installation:**
+4.  **Vector DB Storage Management:**
+    By default, the Vector DB (ChromaDB) stores data in `~/.chroma_db`. Ensure your Linux user has write access to their home directory. Do not run the CLI as `root` unless you explicitly want the database stored in `/root/.chroma_db`.
+
+5.  **Verify installation:**
     ```bash
     recall --help
     ```
